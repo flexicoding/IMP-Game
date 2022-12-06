@@ -6,7 +6,7 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-
+    public int damage = 5;
     public float FlySpeed = 5;
     public float YawAmount = 120;
     public int pitchAmmount;
@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     public int maxEnergy;
     public float energyRegenDelay = 0.1f;
     public int energyPerShot = 10;
+    public int maxCrystals = 100;
     public int maxHP = 100;
     public float HPRegenDelay = 0.1f;
     public float dammageMultiplyer = 1;
@@ -33,7 +34,9 @@ public class PlayerController : MonoBehaviour
     private int HP;
     private Slider HPSlider;
     private TextMeshProUGUI HPText;
-
+    private int crystals;
+    private Slider crystalsSlider;
+    private TextMeshProUGUI crystalsText;
 
 
     private void Start()
@@ -50,8 +53,14 @@ public class PlayerController : MonoBehaviour
         energySlider.maxValue = maxEnergy;
 
         HPSlider = GameObject.Find("Canvas").transform.GetChild(1).GetComponent<Slider>();
+        HPSlider.maxValue = maxHP;
         HPText = GameObject.Find("Canvas").gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         HP = maxHP;
+
+        crystalsSlider = GameObject.Find("Canvas").transform.GetChild(2).GetComponent<Slider>();
+        crystalsText = GameObject.Find("Canvas").gameObject.transform.GetChild(2).gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        crystalsSlider.maxValue = maxCrystals;
+        crystals = 0;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -89,6 +98,8 @@ public class PlayerController : MonoBehaviour
 
                         StartCoroutine(spawnTrail(trail, hit.point, true));
 
+                        gameObject.GetComponent<DammageManager>().dammaged(hit.collider.gameObject, damage, hit.collider.gameObject.tag);
+
                         shootTimer = Time.time;
                         energy -= energyPerShot;
                     }
@@ -121,21 +132,35 @@ public class PlayerController : MonoBehaviour
         }
         HPSlider.value = HP;
         HPText.text = HP.ToString();
+
+        crystalsSlider.value = crystals;
+        crystalsText.text = crystals.ToString();
         #endregion
     }
     private void OnCollisionEnter(Collision collision)
     {
         float magnitude = rb.velocity.magnitude;
-        //rb.AddForce(Vector3.Reflect(transform.position, transform.forward) * magnitude);
         canMove = false;
         StartCoroutine(waiter(Mathf.Round(magnitude * 1000) * 0.001f));
+        gameObject.GetComponent<DammageManager>().dammaged(collision.gameObject, Mathf.RoundToInt(magnitude * 2), collision.gameObject.tag);
+
         HP -= Mathf.RoundToInt(magnitude * dammageMultiplyer);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("crystal"))
+        {
+            int value = other.gameObject.GetComponent<Dissappear>().value;
+            Destroy(other.gameObject);
+            crystals += value;
+        }
     }
 
     #region corotines
     IEnumerator waiter(float speed)
     {
-        yield return new WaitForSeconds(0.175f * speed);
+        yield return new WaitForSeconds(0.05f * speed);
         canMove = true;
     }
     IEnumerator spawnTrail(TrailRenderer Trail, Vector3 HitPoint, bool hasHit)
