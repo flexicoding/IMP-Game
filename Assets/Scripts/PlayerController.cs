@@ -6,7 +6,6 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-
     public float FlySpeed = 5;
     public float YawAmount = 120;
     public int pitchAmmount;
@@ -34,8 +33,6 @@ public class PlayerController : MonoBehaviour
     private Slider HPSlider;
     private TextMeshProUGUI HPText;
 
-
-
     private void Start()
     {
         foreach (Transform child in gameObject.transform)
@@ -56,7 +53,6 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-    // Update is called once per frame
     void Update()
     {
         #region movement
