@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 class AIController : MonoBehaviour
 {
-    public string AIPythonFile;
     public string AIDataFilePath;
     public string AIInterfaceFilePath;
     public string AIFeedbackFilePath;
@@ -26,15 +26,22 @@ class AIController : MonoBehaviour
     {
         environments.Add(new Environment());
     }
+
+    private static int feedback(List<Vector3> output)
+    {
+        return 1;
+    }
+
     private static void run_simulation(Environment env)
     {
         var rand = new System.Random();
         List<Vector3> dt = new List<Vector3>{new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()), new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble())};
+
         PythonInterface.write_input(dt);
         List<Vector3> ot = PythonInterface.read_output();
-        PythonInterface.write_feedback(Mathf.Clamp((int)(ot[0].magnitude * 10), 0, 10));
-        print((int)(ot[0].magnitude));
-        print(ot[0]);
+        PythonInterface.write_feedback(feedback(ot));
+
+        PythonInterface.PyInterface.ListenInterface();
     }
 
     private void Start()

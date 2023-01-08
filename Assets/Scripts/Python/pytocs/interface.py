@@ -157,10 +157,14 @@ class CSInterface:
 
         #We need to create the request file and wait for the request to be validated
         request_path = "./null_req.pytocs"
-        validate_path = "./null_req.pytocs"
+        validate_path = "./null_val.pytocs"
         open(request_path, "a").close()
         while not os.path.exists(validate_path):
             time.sleep(self.update_delay / 100)
         self.ping_pong_flag = True
+
+        #Then delete the files
+        os.remove(request_path)
+        os.remove(validate_path)
 
         #Now the ping-pong principle still holds true

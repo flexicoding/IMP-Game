@@ -6,8 +6,14 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "cwd" : "${workspaceFolder}/Assets/Scripts/Python",
             "justMyCode": true,
-            "cwd": "${workspace_dir}/Scripts/Python"
-        }
+        },
+        {
+            "name": "Unity Editor",
+            "type": "unity",
+            "path": "${workspaceFolder}/Library/EditorInstance.json",
+            "request": "launch",
+        },
     ]
 }

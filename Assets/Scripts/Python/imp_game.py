@@ -22,10 +22,9 @@ def interface() -> CSData:
 
     temp = []
     contents = cs_interface.file_access_request("__data", "r").split("\n")
-    for i in range(0, len(contents) / 3):
-        temp.append([float(contents[i]), 
-                     float(contents[i + 1]), 
-                     float(contents[i + 2])])
+    for i in range(0, len(contents) - 1): 
+        if contents[i] == '': continue
+        temp.append(float(contents[i]))
 
     rt.cs_data = temp
     rt.nt_data = network.compute(np.array(rt.cs_data))
@@ -35,12 +34,12 @@ def interface() -> CSData:
     for i in rt.nt_data: write_contents += str(i[0]) + "\n"
     cs_interface.file_access_request("__interface_in", "w", write_contents)
 
-    rt.cs_factor = cs_interface.file_access_request("__interface_out", "r")
+    rt.cs_factor = int(cs_interface.file_access_request("__interface_out", "r"))
     
     return rt
 
 if __name__ == "__main__":
-    os.chdir("../")
+    os.chdir("../../../") #Change to the project root
 
     sigmoid = lambda x: 1 / (1 + np.exp(-x))
     relu = lambda x: x * (x > 0)
@@ -57,6 +56,8 @@ if __name__ == "__main__":
 
     progress_function_weights = lambda x: 0.1 / (0.029 * x ** 2 + 1)
     progress_function_bias = lambda x: 0.3 / (0.029 * x ** 2 + 1)
+
+    cs_interface.null_request()
 
     while(True):
         dt = interface()

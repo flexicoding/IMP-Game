@@ -19,7 +19,7 @@ public class PYInterface
     private static string reverse(string str)
     {
         string temp = "";
-        for(int i = str.Length; i > -1; i--) temp += str[i];
+        for(int i = str.Length - 1; i > -1; i--) temp += str[i];
         return temp;
     }
 
@@ -211,6 +211,11 @@ public class PYInterface
         {
             Thread.Sleep(update_delay);
         }
+        ping_pong_flag = true;
+        
+        //Now delete the filese
+        File.Delete(request_path);
+        File.Delete(validate_path);
 
         //Now the ping-pong principle holds true
     }

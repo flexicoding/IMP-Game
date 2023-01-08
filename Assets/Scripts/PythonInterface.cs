@@ -14,11 +14,9 @@ public static class PythonInterface
     {
         var temp = new List<Vector3>();
         var contents = PyInterface.FileAccessRequest(InterfaceFilePath, FileMode.Open).Split('\n');
-        
-        if(contents.Length % 3 != 0) throw new System.Exception("Cannot convert list of n mod 3 ≠ 0 elements into list of vector 3.");
 
-        for(int i = 0; i < contents.Length; i += 3)
-        {
+        for(int i = 0; i < contents.Length - 1; i += 3)
+        {   
             var pos = new Vector3();
             pos.x = (float)decimal.Parse(contents[i], System.Globalization.NumberStyles.Float);
             pos.y = (float)decimal.Parse(contents[i + 1], System.Globalization.NumberStyles.Float);

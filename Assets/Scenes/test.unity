@@ -1411,10 +1411,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414d0d640157a4cafb36420b8aa73d7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AIPythonFile: Assets/Scripts/Python/imp_game.py
-  AIDataFilePath: Assets/Scripts/Python/__data
-  AIInterfaceFilePath: Assets/Scripts/Python/__interface_in
-  AIFeedbackFilePath: Assets/Scripts/Python/__interface_out
+  AIDataFilePath: __data
+  AIInterfaceFilePath: __interface_in
+  AIFeedbackFilePath: __interface_out
   EnvironmentSize: 100
   ThreadCount: 8
   AITrain: 1
