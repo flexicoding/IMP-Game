@@ -5,7 +5,6 @@ using UnityEngine;
 public static class PythonInterface
 {
     public static string InterfaceFilePath;
-    public static string FeedbackFilePath;
     public static string InputFilePath;
 
     public static PYInterface PyInterface = new PYInterface();
@@ -24,6 +23,8 @@ public static class PythonInterface
             temp.Add(pos);
         }
 
+        Debug.Log(temp[0]);
+
         return temp;
     }
     public static void write_input(List<Vector3> input)
@@ -37,9 +38,5 @@ public static class PythonInterface
         }
 
         PyInterface.FileAccessRequest(InputFilePath, FileMode.Open, write_contents);
-    }
-    public static void write_feedback(int feedback)
-    {
-        PyInterface.FileAccessRequest(FeedbackFilePath, FileMode.Open, feedback.ToString());
     }
 }

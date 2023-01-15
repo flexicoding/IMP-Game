@@ -20,22 +20,23 @@ class NeuralLayer:
         self.layer_function = activation
         self.layer_inputs = input
 
-        self.__layer_weights = np.random.uniform(-1, 1, (height, width))
-        self.__layer_bias = np.random.uniform(-1, 1, (1, height)).T
+        self.__layer_weights = np.random.uniform(-0.9999, 1, (height, width))
+        self.__layer_bias = np.random.uniform(-4.9999, 5, (height,))
         
     def compute(self, input = None) -> np.ndarray:
         if input.all() != None:
             self.layer_inputs = input
         
-        mul = np.matmul(self.__layer_weights, self.layer_inputs)
-        self.__layer_activation = self.layer_function(mul + self.__layer_bias)
+        p = np.dot(self.__layer_weights, self.layer_inputs)
+        b = p + self.__layer_bias
+        self.__layer_activation = self.layer_function(b)
         self.layer_outputs = self.__layer_activation.copy()
         return self.layer_outputs
 
     def adjust(self, weight_factor: float, bias_factor: float) -> None:
         for i in self.__layer_weights:
             i += rand.uniform(-weight_factor, weight_factor)
-        np.clip(self.__layer_weights, -0.999, 0.999)
+        np.clip(self.__layer_weights, -1.999, 1.999)
         for i in self.__layer_bias:
             i += rand.uniform(-bias_factor, bias_factor)
         np.clip(self.__layer_bias, -9.999, 9.999)
@@ -80,3 +81,7 @@ class NeuralNetwork:
         for l in self.__hidden_layer:
             l.adjust(weight_factor, bias_factor)
         self.__output_layer.adjust(weight_factor, bias_factor)
+
+    def get_input_layer(self) -> NeuralLayer: return self.__input_layer
+    def get_hidden_layers(self): return self.__hidden_layer
+    def get_output_layer(self) -> NeuralLayer: return self.__output_layer

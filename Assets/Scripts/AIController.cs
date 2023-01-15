@@ -2,61 +2,60 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 class AIController : MonoBehaviour
 {
     public string AIDataFilePath;
     public string AIInterfaceFilePath;
-    public string AIFeedbackFilePath;
+    public Transform PlayerTransform;
+    public float WorldXMax = 800;
+    public float WorldYMax = 800;
+    public float WorldZMax = 800;
+    public float Speed = 2;
 
-    public float EnvironmentSize = 100;
-    public int ThreadCount = 8;
-
-    public bool AITrain = false;
-    public Camera PlayerCamera;
-
-    private class Environment
+    private Vector3 world_normalize(Vector3 vec)
     {
-        public List<Vector3> asteroid_positions;
-        public Vector3 ai_spawn_position;
-        public Vector3 player_spawn_position;
+        var ot = new Vector3();
+        ot.x = vec.x / WorldXMax;
+        ot.y = vec.y / WorldYMax;
+        ot.z = vec.z / WorldZMax;
+
+        return ot;
     }
-    private List<Environment> environments = new List<Environment>();
-
-    private void generate_environments()
+    private Vector3 world_denormalize(Vector3 vec)
     {
-        environments.Add(new Environment());
-    }
+        var ot = new Vector3();
+        ot.x = vec.x * WorldXMax;
+        ot.y = vec.y * WorldYMax;
+        ot.z = vec.z * WorldZMax;
 
-    private static int feedback(List<Vector3> output)
-    {
-        return 1;
-    }
-
-    private static void run_simulation(Environment env)
-    {
-        var rand = new System.Random();
-        List<Vector3> dt = new List<Vector3>{new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()), new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble())};
-
-        PythonInterface.write_input(dt);
-        List<Vector3> ot = PythonInterface.read_output();
-        PythonInterface.write_feedback(feedback(ot));
-
-        PythonInterface.PyInterface.ListenInterface();
+        return ot;
     }
 
     private void Start()
     {
-        if(!AITrain) return;
-        PlayerCamera.gameObject.SetActive(false);
-        generate_environments();
-
         PythonInterface.InterfaceFilePath = AIInterfaceFilePath;
-        PythonInterface.FeedbackFilePath = AIFeedbackFilePath;
         PythonInterface.InputFilePath = AIDataFilePath;
     }
-    private void Update()
+
+    //private bool f = false;
+    private void FixedUpdate()
     {
-        if(!AITrain) return;
-        run_simulation(environments[0]);
+        //if(f) return;
+        var input_data = new List<Vector3>();
+        input_data.Add(world_normalize(PlayerTransform.position));
+        input_data.Add(world_normalize(PlayerTransform.GetComponent<Rigidbody>().velocity + PlayerTransform.position));
+        input_data.Add(world_normalize(transform.position));
+
+        print("[PYTOCS] Sent request for __data (write)");
+        PythonInterface.write_input(input_data);
+        print("[PYTOCS] Finished request for __data (write)");
+        print("[PYTOCS] Sent request for __interface (read)");
+        var output_data = PythonInterface.read_output();
+        print("[PYTOCS] Finished request for __interface (read)");
+
+        //GetComponent<Rigidbody>().velocity = world_denormalize(output_data[0]) - transform.position;
+        GetComponent<Rigidbody>().velocity = (output_data[0] - transform.position) * Speed;
+        //f = true;
     }
 }

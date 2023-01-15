@@ -159,6 +159,8 @@ public class PYInterface
                 contents = f.ReadToEnd();
             }
         }
+
+        Thread.Sleep(50);
         
         //We have finished writing so we must delete the validation file for the other process to continue
         File.Delete(validate_path);
@@ -186,6 +188,8 @@ public class PYInterface
             Thread.Sleep(update_delay);
         }
 
+        Thread.Sleep(50);
+
         //The request has been validated and since we are the request origin, we must close off the interface completely
         File.Delete(request_path);
         File.Delete(validate_path);
@@ -212,6 +216,8 @@ public class PYInterface
             Thread.Sleep(update_delay);
         }
         ping_pong_flag = true;
+
+        Thread.Sleep(50);
         
         //Now delete the filese
         File.Delete(request_path);

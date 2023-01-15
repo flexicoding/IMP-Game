@@ -117,6 +117,8 @@ class CSInterface:
             with open(target_file, file_mode) as f:
                 contents = f.read()
 
+        time.sleep(0.05)
+
         #We have finished writing so we must delete the validation file for the other process to continue
         os.remove(validate_path)
 
@@ -138,6 +140,8 @@ class CSInterface:
         open(request_path, "a").close()
         while not os.path.exists(validate_path):
             time.sleep(self.update_delay / 100)
+
+        time.sleep(0.05)
 
         #The request has been validated and since we are the request origin, we must close off the interface completely
         os.remove(request_path)
@@ -162,6 +166,8 @@ class CSInterface:
         while not os.path.exists(validate_path):
             time.sleep(self.update_delay / 100)
         self.ping_pong_flag = True
+
+        time.sleep(0.05)
 
         #Then delete the files
         os.remove(request_path)
