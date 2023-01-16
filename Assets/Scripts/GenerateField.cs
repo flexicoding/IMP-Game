@@ -33,9 +33,8 @@ public class GenerateField : MonoBehaviour
         }
         Destroy(GameObject.Find("AsteroidPrefabs"));
 
-        fileName = "positions.txt";
-        myFilePath = Application.dataPath + "/" + fileName;
-        positionsString = File.ReadAllLines(myFilePath);
+        fileName = "./Assets/positions.txt";
+        positionsString = File.ReadAllLines(fileName);
         int i = 0;
         foreach (string line in positionsString)
         {

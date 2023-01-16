@@ -227,16 +227,19 @@ public class PlayerController : MonoBehaviour
     public void TryAgain()
     {
         SceneManager.LoadScene("Game");
+        Time.timeScale = 1.0f;
     }
     public void Menu()
     {
         SceneManager.LoadScene("Menu");
+        Time.timeScale = 1.0f;
     }
     public void Resume()
     {
         Time.timeScale = 1.0f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        Canvas.transform.GetChild(4).gameObject.SetActive(false);
     }
     public void Quit()
     {
