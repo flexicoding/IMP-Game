@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     public int maxHP = 100;
     public float HPRegenDelay = 0.1f;
     public float dammageMultiplyer = 1;
+    public GameObject Canvas;
 
     private float Yaw;
     private Rigidbody rb;
@@ -72,6 +73,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Canvas.transform.GetChild(4).gameObject.SetActive(true);
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
         #region movement
         // move forward
         if (Input.GetMouseButton(1) && canMove) rb.AddForce(transform.forward  * FlySpeed);//transform.position += transform.forward * FlySpeed * Time.deltaTime;
@@ -96,7 +104,7 @@ public class PlayerController : MonoBehaviour
             {
                 foreach (Transform start in laserstarts)
                 {
-                    if (Physics.Raycast(start.position, start.forward, out RaycastHit hit, 100))
+                    if (Physics.Raycast(start.position, start.forward, out RaycastHit hit, 250))
                     {
                         TrailRenderer trail = Instantiate(bulletTrail, start.position, Quaternion.identity);
 
@@ -110,7 +118,7 @@ public class PlayerController : MonoBehaviour
                     else
                     {
                         TrailRenderer trail = Instantiate(bulletTrail, start.position, Quaternion.identity);
-                        StartCoroutine(spawnTrail(trail, new Ray(start.position, start.forward).GetPoint(100), false));
+                        StartCoroutine(spawnTrail(trail, new Ray(start.position, start.forward).GetPoint(251), false));
 
                         shootTimer = Time.time;
                         energy -= energyPerShot;
@@ -145,9 +153,12 @@ public class PlayerController : MonoBehaviour
         if(HP <= 0)
         {
             Camera.main.transform.parent = null;
+            Instantiate(explosion, Camera.main.transform.position, Quaternion.identity);
             gameObject.SetActive(false);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            for(int i = 0; i < 3; i++) Canvas.transform.GetChild(i).gameObject.SetActive(false);
+            Canvas.transform.GetChild(3).gameObject.SetActive(true);
         }
 
         #endregion
@@ -191,7 +202,8 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
         Trail.transform.position = HitPoint;
-        Instantiate(impact, HitPoint, Quaternion.identity);
+        if(hasHit) Instantiate(impact, HitPoint, Quaternion.identity);
+
 
         Destroy(Trail.gameObject, Trail.time);
     }
@@ -215,6 +227,21 @@ public class PlayerController : MonoBehaviour
     public void TryAgain()
     {
         SceneManager.LoadScene("Game");
+    }
+    public void Menu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+    public void Resume()
+    {
+        Time.timeScale = 1.0f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+    public void Quit()
+    {
+        Application.Quit();
+        print("quit");
     }
     #endregion
 }

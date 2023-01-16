@@ -122,7 +122,6 @@ public class DammageManager : MonoBehaviour
 
         IEnumerator waiter(Vector3 asteroidPos, GameObject obj, string tag)
         {
-            int value = 0;
             switch(tag)
             {
                 case "tiny":
