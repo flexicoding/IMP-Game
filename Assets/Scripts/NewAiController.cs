@@ -15,10 +15,11 @@ class NewAiController : MonoBehaviour
     public float ShootDelay = 0.2f;
     public float HealthRegenTime = 0.5f;
     public float ShieldRegenTime = 0.2f;
-    public float Damage = 10;
+    public int Damage = 10;
 
-    private float health = 100;
-    private float shield = 100;
+    public GameObject Player;
+
+    public int health = 100;
 
     private RaycastHit prev_obstacle = new RaycastHit();
     private float prev_adj = 0;
@@ -104,6 +105,8 @@ class NewAiController : MonoBehaviour
         avoid_obstacles();
         shoot();
         regen();
+
+        if (health <= 0) gameObject.SetActive(false);
     }
 
     private IEnumerator MoveTrail(TrailRenderer trail, Vector3 target)
@@ -119,6 +122,8 @@ class NewAiController : MonoBehaviour
             yield return null;
         }
         trail.transform.position = target;
+
+        if (!Physics.Raycast(PlayerTransform.position, transform.position)) Player.GetComponent<PlayerController>().HP -= Damage;
 
         Destroy(trail.gameObject, trail.time);
     }

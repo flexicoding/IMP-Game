@@ -25,6 +25,10 @@ public class PlayerController : MonoBehaviour
     public float HPRegenDelay = 0.1f;
     public float dammageMultiplyer = 1;
     public GameObject Canvas;
+    public string animName;
+    public List<GameObject> barrels;
+
+    public GameObject AI;
 
     private float Yaw;
     private Rigidbody rb;
@@ -36,12 +40,16 @@ public class PlayerController : MonoBehaviour
     private int energy;
     private bool courotineRunning = false;
     private bool courotineRunning2 = false;
-    private int HP;
+    private bool courotineRunning3 = false;
+    [HideInInspector]
+    public int HP;
     private Slider HPSlider;
     private TextMeshProUGUI HPText;
     private int crystals;
     private Slider crystalsSlider;
     private TextMeshProUGUI crystalsText;
+    [SerializeField]
+    private floatSO score;
 
 
     private void Start()
@@ -73,13 +81,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            Canvas.transform.GetChild(4).gameObject.SetActive(true);
-            Time.timeScale = 0;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
         #region movement
         // move forward
         if (Input.GetMouseButton(1) && canMove) rb.AddForce(transform.forward  * FlySpeed);//transform.position += transform.forward * FlySpeed * Time.deltaTime;
@@ -102,6 +103,11 @@ public class PlayerController : MonoBehaviour
         {
             if(shootTimer + shootingDelay < Time.time && energy >= energyPerShot * laserstarts.Count)
             {
+                foreach(GameObject barrels in barrels)
+                {
+                    barrels.gameObject.GetComponent<Animator>().Play(animName);
+                    print("anim");
+                }
                 foreach (Transform start in laserstarts)
                 {
                     if (Physics.Raycast(start.position, start.forward, out RaycastHit hit, 250))
@@ -160,6 +166,17 @@ public class PlayerController : MonoBehaviour
             for(int i = 0; i < 3; i++) Canvas.transform.GetChild(i).gameObject.SetActive(false);
             Canvas.transform.GetChild(3).gameObject.SetActive(true);
         }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Canvas.transform.GetChild(4).gameObject.SetActive(true);
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        if(Input.GetKey(KeyCode.LeftShift) && !courotineRunning3)
+        {
+            StartCoroutine(hyperjump());
+        }
 
         #endregion
     }
@@ -179,7 +196,9 @@ public class PlayerController : MonoBehaviour
         {
             int value = other.gameObject.GetComponent<Dissappear>().value;
             Destroy(other.gameObject);
-            crystals += value;
+            if (crystals + value < maxCrystals) crystals += value;
+            else crystals = maxCrystals;
+
         }
     }
 
@@ -204,6 +223,7 @@ public class PlayerController : MonoBehaviour
         Trail.transform.position = HitPoint;
         if(hasHit) Instantiate(impact, HitPoint, Quaternion.identity);
 
+        if (!Physics.Raycast(AI.GetComponent<Transform>().position, Camera.main.transform.forward)) AI.GetComponent<NewAiController>().health -= damage;
 
         Destroy(Trail.gameObject, Trail.time);
     }
@@ -221,12 +241,49 @@ public class PlayerController : MonoBehaviour
         courotineRunning2 = false;
         yield break;
     }
+
+    IEnumerator hyperjump()
+    {
+        courotineRunning3 = true;
+        canMove = false;
+        for (float i = 0; i <= 3; i += Time.deltaTime)
+        {
+            float normalizedTime = i / 3;
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                Canvas.transform.GetChild(5).gameObject.SetActive(true);
+                Canvas.transform.GetChild(5).gameObject.GetComponent<Image>().color = Color.Lerp(new Color(1,1,1,0), new Color(1, 1, 1, 1), normalizedTime);
+
+                yield return null;
+            }
+            else
+            {
+                courotineRunning3 = false;
+                canMove = true;
+                Canvas.transform.GetChild(5).gameObject.GetComponent<Image>().color = new Color(1, 1, 1, 0);
+                Canvas.transform.GetChild(5).gameObject.SetActive(false);
+                yield break;
+            }
+        }
+        canMove = true;
+        Time.timeScale = 0;
+        Canvas.transform.GetChild(5).gameObject.SetActive(false);
+        Canvas.transform.GetChild(6).gameObject.SetActive(true);
+        score.Value += crystals;
+        Canvas.transform.GetChild(6).transform.GetChild(1).transform.GetComponent<TextMeshProUGUI>().text += crystals;
+        Canvas.transform.GetChild(6).transform.GetChild(2).transform.GetComponent<TextMeshProUGUI>().text += score.Value;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        yield break;
+    }
     #endregion
 
     #region buttons
     public void TryAgain()
     {
         SceneManager.LoadScene("Game");
+        score.Value += crystals;
         Time.timeScale = 1.0f;
     }
     public void Menu()
